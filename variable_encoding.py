@@ -1,27 +1,25 @@
 import math
 
-def log_b(n): return math.ceil(math.log(n,2))
-
-def length(n):
-	if n == 0: return 1
-	if n == 1: return 3
-	return 1+n+length(log_b(n+2)-1)
-
-def to_string(s, final = True):
-	if s == "": return "0"
-	n = '{0:b}'.format(len(s))
-	if n != "1"*len(n): n = n[1:]
-	prefix = "1"
-	if n != "1": prefix = to_string(n, False)
+def encode(s, final = True):
+	if s == "": return str(int(not final))
+	n = '{0:b}'.format(len(s))[1:]
+	prefix = encode(n, False)
 	return prefix + s + str(int(not final))
-	
-def efficiency():
-	for i in range(24):
-		print(2**i,length(2**i), length(2**i)/(2**i))
-	
-def test():
-	for i in range(1000):
-		if len(to_string("0"*i)) != length(i): 
-			print(i,to_string("0"*i), length(i))
 
-efficiency()
+def decode(s, l=0):
+	assert len(s) > l
+	content = s[0:l]
+	ended = s[l]
+	s = s[l+1:]
+	if ended == "0":
+		assert len(s) == 0
+		return content
+	return decode(s, int("1"+content, 2))
+
+def test():
+	for i in range(10000):
+		m = '{0:b}'.format(i)
+		assert m == decode(encode(m))
+
+print(encode(input(">>>")))
+
